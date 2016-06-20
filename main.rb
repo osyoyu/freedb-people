@@ -11,17 +11,25 @@ def multi_japanese?(*texts)
   japanese?(joined_text)
 end
 
-freedb_files = Dir.glob(ARGV[0])
-freedb_files.each do |file|
-  next unless File.file?(file)
+dirs = ARGV
+threads = []
+dirs.each do |dir|
+  threads << Thread.new {
+    freedb_files = Dir.glob("#{dir}/**/*")
+    freedb_files.each do |file|
+      next unless File.file?(file)
 
-  begin
-    entry = FreeDBEntry.new(File.read(file))
+      begin
+        entry = FreeDBEntry.new(File.read(file))
 
-    if multi_japanese?(entry.attrs[:title], entry.attrs[:artist])
-      puts "\"#{entry.attrs[:artist]}\",\"#{entry.attrs[:title]}\",\"#{entry.attrs[:genre]}\""
+        if multi_japanese?(entry.attrs[:title], entry.attrs[:artist])
+          puts "\"#{entry.attrs[:artist]}\",\"#{entry.attrs[:title]}\",\"#{entry.attrs[:genre]}\""
+        end
+      rescue => e
+        next
+      end
     end
-  rescue => e
-    next
-  end
+  }
 end
+
+threads.each { |thr| thr.join }
