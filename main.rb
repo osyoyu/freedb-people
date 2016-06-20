@@ -1,17 +1,27 @@
 require_relative './freedb_entry'
+require 'pp'
 
-def is_japanese?(text)
+def japanese?(text)
   text =~ /\A(?:\p{Hiragana}|\p{Katakana}|[ー－]|[一-龠々])+\z/
 end
 
-# FreeDB のファイルをパースする.
-#
-# TITLEn -> (n + 1) 曲目の "アーティスト名 / 曲名"
+# 複数の文字列のどれかが日本語であるかを高速に当てるための最悪なメソッド
+def multi_japanese?(*texts)
+  joined_text = texts.join('')
+  japanese?(joined_text)
+end
 
-freedb_files = Dir.glob("./freedb-update/**/34062806")
+freedb_files = Dir.glob(ARGV[0])
 freedb_files.each do |file|
   next unless File.file?(file)
 
-  entry = FreeDBEntry.new(File.read(file))
-  puts entry.attrs[:tracks]
+  begin
+    entry = FreeDBEntry.new(File.read(file))
+
+    if multi_japanese?(entry.attrs[:title], entry.attrs[:artist])
+      puts "\"#{entry.attrs[:artist]}\",\"#{entry.attrs[:title]}\",\"#{entry.attrs[:genre]}\""
+    end
+  rescue => e
+    next
+  end
 end

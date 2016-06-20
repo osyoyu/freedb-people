@@ -1,0 +1,18 @@
+GIT
+  remote: https://github.com/igrigorik/language_detector
+  revision: f985a673422f1d6b962a60ffa292e80129c582f0
+  specs:
+    language_detector (0.1.3)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  language_detector!
+
+BUNDLED WITH
+   1.12.5
