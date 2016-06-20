@@ -9,7 +9,8 @@ class FreeDBEntry
       comment: '',
       title: '',
       artist: '',
-      tracks: []
+      tracks: [],
+      is_japanese: nil
     }
 
     parse!
@@ -28,10 +29,12 @@ class FreeDBEntry
   end
 
   def parse_line!(line)
+    line = line.encode("UTF-16BE", "UTF-8", :invalid => :replace, :undef => :replace, :replace => '?').encode("UTF-8")
+    @attrs[:is_japanese] ||= japanese?(line)
+
     if line[0] == '#'
       add_comment!(line[2..-1])
     else
-      line = line.encode("UTF-16BE", "UTF-8", :invalid => :replace, :undef => :replace, :replace => '?').encode("UTF-8")
       key, value = line.split("=", 2)
       add_raw_attr!(key, value)
     end
@@ -66,8 +69,8 @@ class FreeDBEntry
 
     if data.size == 3
       {
-        title: data[2],
-        artist: data[1]
+        title: data[2].strip,
+        artist: data[1].strip
       }
     else
       {
@@ -81,5 +84,9 @@ class FreeDBEntry
       title: str,
       artist: ''
     }
+  end
+
+  def japanese?(text)
+    text =~ /(?:\p{Hiragana}|\p{Katakana}|[ー－]|[一-龠々])+/
   end
 end

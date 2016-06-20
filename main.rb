@@ -1,16 +1,6 @@
 require_relative './freedb_entry'
 require 'pp'
 
-def japanese?(text)
-  text =~ /\A(?:\p{Hiragana}|\p{Katakana}|[ー－]|[一-龠々])+\z/
-end
-
-# 複数の文字列のどれかが日本語であるかを高速に当てるための最悪なメソッド
-def multi_japanese?(*texts)
-  joined_text = texts.join('')
-  japanese?(joined_text)
-end
-
 dirs = ARGV
 threads = []
 dirs.each do |dir|
@@ -22,10 +12,11 @@ dirs.each do |dir|
       begin
         entry = FreeDBEntry.new(File.read(file))
 
-        if multi_japanese?(entry.attrs[:title], entry.attrs[:artist])
+        if entry.attrs[:is_japanese]
           puts "\"#{entry.attrs[:artist]}\",\"#{entry.attrs[:title]}\",\"#{entry.attrs[:genre]}\""
         end
       rescue => e
+        p e
         next
       end
     end
