@@ -1,3 +1,5 @@
+require_relative './is_japanese'
+
 class FreeDBEntry
   attr_accessor :attrs
 
@@ -30,7 +32,7 @@ class FreeDBEntry
 
   def parse_line!(line)
     line = line.encode("UTF-16BE", "UTF-8", :invalid => :replace, :undef => :replace, :replace => '?').encode("UTF-8")
-    @attrs[:is_japanese] ||= japanese?(line)
+    @attrs[:is_japanese] ||= IsJapanese::japanese?(line)
 
     if line[0] == '#'
       add_comment!(line[2..-1])
@@ -84,9 +86,5 @@ class FreeDBEntry
       title: str,
       artist: ''
     }
-  end
-
-  def japanese?(text)
-    text =~ /(?:\p{Hiragana}|\p{Katakana}|[ー－]|[一-龠々])+/
   end
 end

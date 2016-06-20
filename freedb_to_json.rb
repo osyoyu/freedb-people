@@ -1,5 +1,6 @@
-require_relative './freedb_entry'
+require 'json'
 require 'pp'
+require_relative './freedb_entry'
 
 dirs = ARGV
 threads = []
@@ -13,7 +14,14 @@ dirs.each do |dir|
         entry = FreeDBEntry.new(File.read(file))
 
         if entry.attrs[:is_japanese]
-          puts "\"#{entry.attrs[:artist]}\",\"#{entry.attrs[:title]}\",\"#{entry.attrs[:genre]}\""
+          # puts "\"#{entry.attrs[:artist]}\",\"#{entry.attrs[:title]}\",\"#{entry.attrs[:genre]}\""
+          json = JSON.generate({
+              title: entry.attrs[:title],
+              artist: entry.attrs[:artist],
+              genre: entry.attrs[:genre],
+              tracks: entry.attrs[:tracks]
+          })
+          puts json
         end
       rescue => e
         p e
