@@ -6,25 +6,28 @@ output = {}
 File.open(ARGV[1]).each_line.with_index do |line, index|
   STDERR.puts "#{index} lines processed" if index % 1000 == 0
 
-  word = line.split(",")[0]
-  next unless IsJapanese::japanese?(word)
+  begin
+    word = line.split(",")[0]
+    next unless IsJapanese::japanese?(word)
 
-  hits = []
-  File.open(ARGV[0]) do |f|
-    f.any? do |line|
-      if line.include?(word)
-        hits << line
+    hits = []
+    File.open(ARGV[0]) do |f|
+      f.any? do |line|
+        if line.include?(word)
+          hits << line
+        end
       end
     end
-  end
 
-  hits.each do |hit|
-    album_data = JSON.parse(hit)
-    output[word] ||= {
-      type: 'music-artist',
-      albums: []
-    }
-    output[word][:albums] << album_data
+    hits.each do |hit|
+      album_data = JSON.parse(hit)
+      output[word] ||= {
+        type: 'music-artist',
+        albums: []
+      }
+      output[word][:albums] << album_data
+    end
+  rescue
   end
 end
 
